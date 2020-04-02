@@ -5,17 +5,18 @@ const kick_threshold = 0.25;
 
 module.exports = {
   vote: async function vote(message, member) {
+      
     const userID = member.user.id;
     const guildMembers = member.guild.memberCount;
     const authorID = message.author.id;
 
     // Check if the targeted user is immune to kick or is self
     if (member.hasPermission("ADMINISTRATOR")) {
-        return message.channel.send("You cannot kick the admin!");
+      return message.channel.send("You cannot kick the admin!");
     } else if (member.user.bot) {
-        return message.channel.send("You cannot kick a bot!");
+      return message.channel.send("You cannot kick a bot!");
     } else if (userID == authorID) {
-        return message.channel.send("You cannot kick yourself!");
+      return message.channel.send("You cannot kick yourself!");
     }
 
     // Find or create entry in database
@@ -57,30 +58,31 @@ module.exports = {
           .setDescription(`**<@${userID}> is kicked!**`)
           .setFooter(`Last voted by ${message.author.username}`)
       );
-        await KickVotes.destroy({ where: {user_id: userID} });
+      await KickVotes.destroy({ where: { user_id: userID } });
     } else {
       message.channel.send(
         new Discord.MessageEmbed()
           .setDescription(`**Vote kick added for <@${userID}>.**`)
-          .addField(`Current votes`, `${nVote}`)
-          .addField(`Required votes`, `${nRequired}`)
+          .addField(`Current Votes`, `${nVote}`, true)
+          .addField(`Required Votes`, `${nRequired}`, true)
           .setFooter(`Last voted by ${message.author.username}`)
       );
     }
   },
 
   unvote: async function unvote(message, member) {
+
     const userID = member.user.id;
     const guildMembers = member.guild.memberCount;
     const authorID = message.author.id;
 
     // Check if the targeted user is immune to unvote kick or is self
     if (member.hasPermission("ADMINISTRATOR")) {
-        return message.channel.send("You cannot unvote kick the admin!");
+      return message.channel.send("You cannot unvote kick the admin!");
     } else if (member.user.bot) {
-        return message.channel.send("You cannot unvote kick a bot!");
+      return message.channel.send("You cannot unvote kick a bot!");
     } else if (userID == authorID) {
-        return message.channel.send("You cannot unvote kick yourself!");
+      return message.channel.send("You cannot unvote kick yourself!");
     }
 
     // Find or create entry in database
@@ -106,11 +108,41 @@ module.exports = {
     message.channel.send(
       new Discord.MessageEmbed()
         .setDescription(`**Vote kick removed for <@${userID}>.**`)
-        .addField(`Current votes`, `${entry.counts}`)
-        .addField(`Required votes`, `${Math.floor(guildMembers * kick_threshold)}`)
+        .addField(`Current Votes`, `${entry.counts}`, true)
+        .addField(
+          `Required Votes`,
+          `${Math.floor(guildMembers * kick_threshold)}`,
+          true
+        )
     );
 
     // Remove entry from DB
-    await KickVotes.destroy({ where: {user_id: userID} });
+    await KickVotes.destroy({ where: { user_id: userID } });
+  },
+
+  view: async function view(message) {
+
+    const guildMembers = message.guild.memberCount;
+
+    // Get all entries
+    const entries = await KickVotes.findAll();
+    const nRequired = Math.floor(guildMembers * kick_threshold);
+
+    // Create the result embed
+    const embed = new Discord.MessageEmbed()
+      .setTitle(`**Vote Kick Records**`)
+      .addField(`Required Votes`, `${nRequired}`, true);
+
+    if (!entries.length) {
+      embed.setDescription("No entries");
+    }
+
+    for (const entry of entries) {
+      embed.addField("\u200B", `<@${entry.user_id}>`);
+      embed.addField(`Current Votes`, `${entry.counts}`, true);
+      embed.addField(`Needed Votes`, `${nRequired - entry.counts}`, true);
+    }
+
+    message.channel.send(embed);
   }
 };

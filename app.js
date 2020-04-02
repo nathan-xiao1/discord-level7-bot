@@ -36,7 +36,10 @@ client.on("message", message => {
     message.mentions.members.forEach(member => {
       voteKick.unvote(message, member);
     });
+  } else if (command == "viewvote") {
+    voteKick.view(message);
   }
+
 });
 
 // Login
