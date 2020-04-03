@@ -21,25 +21,25 @@ client.on("message", message => {
   const command = args.shift().toLowerCase();
 
   // Different commands
-  if (command == "votekick") {
+  if (command == "help") {
+    return message.channel.send("**No one is going to help you**")
+  } else if (command == "kick") {
     if (!args.length || !message.mentions.users.size) {
-      return message.channel.send(`\`Usage: ${command} @user\``);
+      return message.channel.send(`\`Usage: !${command} @user\``);
     }
     message.mentions.members.forEach(member => {
       voteKick.vote(message, member);
-    });
-
-  } else if (command == "unvotekick") {
+    })
+  } else if (command == "unkick") {
     if (!args.length || !message.mentions.users.size) {
-      return message.channel.send(`\`Usage: ${command} @user\``);
+      return message.channel.send(`\`Usage: !${command} @user\``);
     }
     message.mentions.members.forEach(member => {
       voteKick.unvote(message, member);
     });
-  } else if (command == "viewvote") {
+  } else if (command == "record") {
     voteKick.view(message);
   }
-
 });
 
 // Login

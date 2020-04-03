@@ -12,11 +12,11 @@ module.exports = {
 
     // Check if the targeted user is immune to kick or is self
     if (member.hasPermission("ADMINISTRATOR")) {
-      return message.channel.send("You cannot kick the admin!");
+      return message.channel.send("**⚠ You cannot kick the admin!**");
     } else if (member.user.bot) {
-      return message.channel.send("You cannot kick a bot!");
+      return message.channel.send("**⚠ You cannot kick a bot!**");
     } else if (userID == authorID) {
-      return message.channel.send("You cannot kick yourself!");
+      return message.channel.send("**⚠ You cannot kick yourself!**");
     }
 
     // Find or create entry in database
@@ -32,16 +32,16 @@ module.exports = {
         });
       } catch (e) {
         if (e.name === "SequelizeUniqueConstraintError") {
-          return message.reply("That tag already exists.");
+          return message.reply("**⚠ That entry already exists.**");
         }
-        return message.channel.send(`Something went wrong: ${e}`);
+        return message.channel.send(`**⚠ Something went wrong: ${e}**`);
       }
     }
 
     // Check if voter has already voted
     const voters = entry.voters;
     if (voters.includes(authorID)) {
-      return message.channel.send(`You have already voted for <@${userID}>`);
+      return message.channel.send(`**⚠ You have already voted for <@${userID}>**`);
     }
 
     // Update voters
@@ -52,7 +52,7 @@ module.exports = {
     const nVote = entry.counts;
     const nRequired = Math.floor(guildMembers * kick_threshold);
     if (nVote > nRequired) {
-      member.user.kick("You have been vote kicked!");
+      member.user.kick("**⚠ You have been vote kicked!**");
       message.channel.send(
         new Discord.MessageEmbed()
           .setDescription(`**<@${userID}> is kicked!**`)
@@ -78,11 +78,11 @@ module.exports = {
 
     // Check if the targeted user is immune to unvote kick or is self
     if (member.hasPermission("ADMINISTRATOR")) {
-      return message.channel.send("You cannot unvote kick the admin!");
+      return message.channel.send("**⚠ You cannot unvote kick the admin!**");
     } else if (member.user.bot) {
-      return message.channel.send("You cannot unvote kick a bot!");
+      return message.channel.send("**⚠ You cannot unvote kick a bot!**");
     } else if (userID == authorID) {
-      return message.channel.send("You cannot unvote kick yourself!");
+      return message.channel.send("**⚠ You cannot unvote kick yourself!**");
     }
 
     // Find or create entry in database
@@ -91,13 +91,13 @@ module.exports = {
     });
 
     if (!entry) {
-      return message.channel.send(`There are current no vote for <@${userID}>`);
+      return message.channel.send(`**⚠ There are current no vote for <@${userID}>**`);
     }
 
     // Check if voter has voted
     const voters = entry.voters;
     if (!voters.includes(authorID)) {
-      return message.channel.send(`You have not voted for <@${userID}>`);
+      return message.channel.send(`**⚠ You have not voted for <@${userID}>**`);
     }
 
     // Remove the voter as voted
