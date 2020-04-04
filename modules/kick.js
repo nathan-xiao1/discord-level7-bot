@@ -52,17 +52,13 @@ module.exports = {
     const nVote = entry.counts;
     const nRequired = Math.floor(guildMembers * kick_threshold);
     if (nVote > nRequired) {
-      member.user.kick("**⚠ You have been vote kicked!**");
-      message.channel.send(
-        new Discord.MessageEmbed()
-          .setDescription(`**<@${userID}> is kicked!**`)
-          .setFooter(`Last voted by ${message.author.username}`)
-      );
+      member.user.kick("**You have been vote kicked!**");
+      message.channel.send(`**✅ <@${userID}> is now kicked from the server.**`)
       await KickVotes.destroy({ where: { user_id: userID } });
     } else {
       message.channel.send(
         new Discord.MessageEmbed()
-          .setDescription(`**Vote kick added for <@${userID}>.**`)
+          .setDescription(`**✅ Vote kick added for <@${userID}>.**`)
           .addField(`Current Votes`, `${nVote}`, true)
           .addField(`Required Votes`, `${nRequired}`, true)
           .setFooter(`Last voted by ${message.author.username}`)
@@ -107,7 +103,7 @@ module.exports = {
     // Display result
     message.channel.send(
       new Discord.MessageEmbed()
-        .setDescription(`**Vote kick removed for <@${userID}>.**`)
+        .setDescription(`**✅ Vote kick removed for <@${userID}>.**`)
         .addField(`Current Votes`, `${entry.counts}`, true)
         .addField(
           `Required Votes`,
@@ -130,15 +126,16 @@ module.exports = {
 
     // Create the result embed
     const embed = new Discord.MessageEmbed()
-      .setTitle(`**Vote Kick Records**`)
-      .addField(`Required Votes`, `${nRequired}`, true);
+      .setTitle(`**Vote Kick Records**`);
 
     if (!entries.length) {
-      embed.setDescription("No entries");
+      embed.setDescription("⚠ No entries");
+    } else {
+      embed.addField(`Required Votes`, `${nRequired}`, true);
     }
 
     for (const entry of entries) {
-      embed.addField("\u200B", `<@${entry.user_id}>`);
+      embed.addField("\u200B", `👤 <@${entry.user_id}>`);
       embed.addField(`Current Votes`, `${entry.counts}`, true);
       embed.addField(`Needed Votes`, `${nRequired - entry.counts}`, true);
     }
