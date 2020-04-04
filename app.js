@@ -7,6 +7,7 @@ const { KickVotes } = require('./dbObjects');
 const voteKick = require('./modules/kick');
 const utils = require('./modules/utils');
 const play = require('./modules/play');
+const say = require('./modules/say')
 
 const client = new Discord.Client();
 const prefix = config.prefix;
@@ -19,6 +20,7 @@ const commands = {
   "viewkicks": voteKick.viewKicks,
   "play": play.play,
   "volume": play.volume,
+  "say": say.say,
 }
 
 client.once("ready", () => {
@@ -32,6 +34,11 @@ client.on("message", message => {
   // Parse the message as command and arguments
   const args = message.content.slice(prefix.length).split(" ");
   const command = args.shift().toLowerCase();
+
+  // Check if message is from direct message
+  if (message.channel.type === "dm" && command != "say") {
+    return message.channel.send("**⚠ Sorry I don't work in DM**");
+  }
 
   // Execute command
   if (commands[command] != undefined) {
