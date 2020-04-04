@@ -6,6 +6,7 @@ const { KickVotes } = require('./dbObjects');
 // Import modules
 const voteKick = require('./modules/kick');
 const utils = require('./modules/utils');
+const play = require('./modules/play');
 
 const client = new Discord.Client();
 const prefix = config.prefix;
@@ -16,6 +17,8 @@ const commands = {
   "kick": voteKick.kick,
   "unkick": voteKick.unkick,
   "viewkicks": voteKick.viewKicks,
+  "play": play.play,
+  "volume": play.volume,
 }
 
 client.once("ready", () => {
