@@ -21,6 +21,7 @@ const commands = {
   "play": play.play,
   "volume": play.volume,
   "say": say.say,
+  "pause": say.pause,
 }
 
 client.once("ready", () => {
