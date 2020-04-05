@@ -8,6 +8,7 @@ const voteKick = require('./modules/kick');
 const utils = require('./modules/utils');
 const play = require('./modules/play');
 const say = require('./modules/say')
+const voice = require('./modules/voice')
 
 const client = new Discord.Client();
 const prefix = config.prefix;
@@ -19,9 +20,8 @@ const commands = {
   "unkick": voteKick.unkick,
   "viewkicks": voteKick.viewKicks,
   "play": play.play,
-  "volume": play.volume,
+  "pause": voice.pause,
   "say": say.say,
-  "pause": say.pause,
 }
 
 client.once("ready", () => {

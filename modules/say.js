@@ -3,17 +3,20 @@ const prefix = config.prefix;
 
 module.exports = {
     say: main,
-    pause: pause,
+    queue_say: say,
 }
 
 // Using Google Translate TTS
 const ttsUrl = "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q="
 
-const queues = {};
-const dispatchers = {};
+// Import variables from voice.js
+const voice = require("./voice")
+const queues = voice.queues;
+const dispatchers = voice.dispatchers
 
 function main(args, message) {
 
+    // Usage and error checking
     if (!args.length) {
         return message.channel.send(`⚠ **Usage**: \`${prefix}say "message"\``);
     } else if (message.member.voice.channel == undefined) {
@@ -25,55 +28,18 @@ function main(args, message) {
     // Encode the message
     let msg = encodeURI(args.join(" "))
 
-    // Add message to queue
-    const vcID = message.member.voice.channel.id;
-
-    // Play if first in queue
-    if (!queues[vcID]) {
-        queues[vcID] = [msg.valueOf()];
-        say(vcID, message);
-    } else {
-        queues[vcID].push(msg.valueOf())
-    }
-    
+    // Add msg to queue
+    voice.queue_add(message, {
+        type: "say",
+        value: msg,
+    })
 }
 
-async function say(vcID, message) {
-
-    // Join channel
-    const connection = await message.member.voice.channel.join();
-
-    // Get message from queue
-    const msg = queues[vcID].shift();
+function say(vcID, connection, msg) {
 
     // Play the TTS message
     const dispatcher = connection.play(ttsUrl + msg);
     dispatchers[vcID] = dispatcher;
 
-    dispatcher.on('finish', () => {
-        if (queues[vcID][0]) {
-            say(vcID, message);
-        } else {
-            delete queues[vcID];
-            delete dispatchers[vcID];
-        }
-    });
-    
-    dispatcher.on('error', () => {
-        message.channel.send("**⚠ Oh no! Something went wrong.**");
-    });
-
-}
-
-function pause(args, message) {
-
-    const vcID = message.member.voice.channel.id;
-
-    // Get dispatcher
-    if (dispatchers[vcID]) {
-        dispatchers[vcID].pause();
-    } else {
-        return message.channel.send("**⚠ There is nothing to pause right now!**");
-    }
-    return message.channel.send("**✅ Paused!**");
+    return dispatcher;
 }

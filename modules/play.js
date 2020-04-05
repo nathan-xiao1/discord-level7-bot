@@ -1,53 +1,53 @@
+const ytdl = require('ytdl-core-discord');
 const config = require("../config.json");
 const prefix = config.prefix;
 
-const ytdl = require('ytdl-core-discord');
-
 module.exports = {
-    play: play,
-    volume: setVolume,
+    play: main,
+    queue_play: play,
 }
+
+// Import variables from voice.js
+const voice = require("./voice")
+const queues = voice.queues;
+const dispatchers = voice.dispatchers
 
 let volume = 1;
 
-async function play(args, message) {
+function main(args, message) {
 
+    // Usage and error checking
     if (args.length != 1) {
         return message.channel.send(`⚠ **Usage**: \`${prefix}play url\``);
     } else if (message.member.voice.channel == undefined) {
         return message.channel.send("**⚠ You must be in a voice channel to use this command!**");
     }
 
+    // Get URL
     const url = args[0];
 
-    // Join channel
-    const connection = await message.member.voice.channel.join();
+    // Add message to queue
+    const vcID = message.member.voice.channel.id;
 
-    // Create a dispatcher
-    let dispatcher;
+    // Add url to queue
+    voice.queue_add(message, {
+        type: "play",
+        value: url,
+    })
+
+}
+
+async function play(vcID, connection, url) {
     try {
-        dispatcher = connection.play(await ytdl(url), {
+        // Play a YouTube URL
+        const dispatcher = connection.play(await ytdl(url), {
             type: 'opus',
             volume: volume
         });
+        dispatchers[vcID] = dispatcher;
+        return dispatcher
     } catch (e) {
-        return message.channel.send(`**⚠ Invalid URL:** \`${url}\``);
+        console.log(e)
+        return undefined
     }
-    
-    dispatcher.on('error', () => {
-        message.channel.send("**⚠ Oh no! Something went wrong.**");
-    });
-}
-
-function setVolume(args, message) {
-
-    if (args.length != 1) {
-        return message.channel.send(`⚠ **Usage**: \`${prefix}volume value\``);
-    } else if (args[0] < 0 || args[0] > 1) {
-        return message.channel.send('⚠ **Value must between 0 and 1 inclusive!**');
-    }
-    
-    // Change volume
-    volume = args[0];
-    return message.channel.send(`✅ **Volume set to '${volume}'. New volume will apply on next '${prefix}play'.**`);
 }
