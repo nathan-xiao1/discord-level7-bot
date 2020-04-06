@@ -37,12 +37,13 @@ function main(args, message) {
 
 }
 
-async function play(vcID, connection, url) {
+async function play(vcID, connection, url, volume) {
     try {
         // Play a YouTube URL
         const dispatcher = connection.play(await ytdl(url), {
             type: 'opus',
-            volume: volume
+            volume: volume,
+            highWaterMark: 50
         });
         dispatchers[vcID] = dispatcher;
         return dispatcher

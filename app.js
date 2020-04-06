@@ -20,8 +20,12 @@ const commands = {
   "unkick": voteKick.unkick,
   "viewkicks": voteKick.viewKicks,
   "play": play.play,
-  "pause": voice.pause,
   "say": say.say,
+  "pause": voice.pause,
+  "resume": voice.resume,
+  "volume": voice.volume,
+  "skip": voice.skip,
+  "queue": voice.queue,
 }
 
 client.once("ready", () => {

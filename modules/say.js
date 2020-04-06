@@ -35,10 +35,10 @@ function main(args, message) {
     })
 }
 
-function say(vcID, connection, msg) {
+function say(vcID, connection, msg, volume) {
 
     // Play the TTS message
-    const dispatcher = connection.play(ttsUrl + msg);
+    const dispatcher = connection.play(ttsUrl + msg, { volume: volume });
     dispatchers[vcID] = dispatcher;
 
     return dispatcher;
